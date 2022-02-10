@@ -1,4 +1,4 @@
-FROM ghcr.io/linuxserver/baseimage-ubuntu:bionic
+FROM ghcr.io/linuxserver/baseimage-ubuntu:focal
 
 # set version label
 ARG BUILD_DATE
@@ -17,7 +17,7 @@ RUN \
   apt-get install -y \
     gnupg && \
   curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
-  echo 'deb https://deb.nodesource.com/node_14.x bionic main' \
+  echo 'deb https://deb.nodesource.com/node_14.x focal main' \
     > /etc/apt/sources.list.d/nodesource.list && \
   curl -s https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
   echo 'deb https://dl.yarnpkg.com/debian/ stable main' \
@@ -55,6 +55,13 @@ RUN \
   curl -s -qL -o terraform.zip https://releases.hashicorp.com/terraform/$TERRAFORM_VERSION/terraform_$TERRAFORM_VERSION\_linux_amd64.zip && \
   unzip -o terraform.zip && \
   mv terraform /usr/bin && \
+  echo "**** install pre-commit ****" && \
+  pip3 install --no-cache-dir pre-commit && \
+  echo "**** install checkov ****" && \
+  pip3 install --no-cache-dir checkov && \
+  echo "**** install infracost ****" && \
+  curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh && \
+  infracost register && \
   echo "**** install code-server ****" && \
   if [ -z ${CODE_RELEASE+x} ]; then \
     CODE_RELEASE=$(curl -sX GET https://registry.yarnpkg.com/code-server \
